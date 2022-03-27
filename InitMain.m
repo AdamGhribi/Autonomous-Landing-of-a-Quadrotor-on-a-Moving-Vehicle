@@ -33,6 +33,27 @@ if (StepOrWave<0)
 else
     l=max(x,y)+1;
 end
+%% Controller 
+% Position Controller
+Kp_x = 6.9;
+Ki_x = 0;%3.16;
+Kd_x = 15;%12.49;
+
+Kp_y = 6.9;
+Ki_y = 0;%3.16;
+Kd_y = 15;%6.02;
+
+Kp_z = 20;%18.7;
+Ki_z = 10;
+Kd_z = 8;%6.04;
+
+% Attitude Controller
+Kq_xy = 4;
+Kq_z  = 3;
+
+% Rate Controller
+K_omega = 7*diag([3.38 3.44 3.33]);
+
 %% LQR 
 [A,B,C,D]=linmod('Model',zeros(12,1),[M*g0 0 0 0]');
 % x = [x y z phi theta psi p q r u v w]'
@@ -172,26 +193,6 @@ legend('Z','$Z_{des}$','Interpreter','latex','Fontsize',16,'Location','best')
 
 
 
-%% Controller 
-% Position Controller
-Kp_x = 6.9;
-Ki_x = 0;%3.16;
-Kd_x = 15;%12.49;
-
-Kp_y = 6.9;
-Ki_y = 0;%3.16;
-Kd_y = 15;%6.02;
-
-Kp_z = 20;%18.7;
-Ki_z = 10;
-Kd_z = 8;%6.04;
-
-% Attitude Controller
-Kq_xy = 4;
-Kq_z  = 3;
-
-% Rate Controller
-K_omega = 7*diag([3.38 3.44 3.33]);
 
 
 
