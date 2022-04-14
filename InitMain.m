@@ -8,6 +8,7 @@ clc
 
 
 %% init
+x0= [5 0 10];
 kt = 6.7e-6; % Thrust coefficient [-]
 kd = 3.12e-7; % Drag torque constant [-]
 CD = diag([0.16 0.32 1.1e-6]); % Drag coefficient 3x3 (Cdx Cdy Cdz) [-]
@@ -33,6 +34,19 @@ if (StepOrWave<0)
 else
     l=max(x,y)+1;
 end
+
+%%
+dt=0.01;
+A_mpc=blkdiag([1 dt 0;0 1 dt;0 0 1],[1 dt 0;0 1 dt;0 0 1],[1 dt 0;0 1 dt;0 0 1]);
+B_mpc=zeros(9,3);
+B_mpc(3,1)=dt;
+B_mpc(6,2)=dt;
+B_mpc(9,3)=dt;
+D_mpc=0;
+C_mpc=[1 zeros(1,8);0 0 0 1 zeros(1,5); zeros(1,6) 1 0 0;
+        0 1 zeros(1,7); zeros(1,4) 1 zeros(1,4); zeros(1,7)  1 0;
+         0 0 1 zeros(1,6); zeros(1,5) 1 zeros(1,3); zeros(1,8) 1];
+
 %% Controller 
 % Position Controller
 Kp_x = 6.9;
@@ -54,6 +68,11 @@ Kq_z  = 3;
 % Rate Controller
 K_omega = 7*diag([3.38 3.44 3.33]);
 
+%%%%%
+kx = 16;
+kv = 5.6;
+kr = 8.81;
+k_omega = 2.54;
 %% LQR 
 [A,B,C,D]=linmod('Model',zeros(12,1),[M*g0 0 0 0]');
 % x = [x y z phi theta psi p q r u v w]'
@@ -84,27 +103,29 @@ Ki=-Ka(:,13:16);
 
 
 %%
-out=sim('SiL.slx',100);
+out=sim('SiL.slx',10);
 figure
 plot3(out.pos_des.Data(:,1),out.pos_des.Data(:,2),out.pos_des.Data(:,3),'r--')
 hold on
-plot3(0,0,0,'*')
+plot3(x0(1),x0(2),x0(3),'*')
 curve=animatedline();
-set(gca,'XLim',[-l l],'YLim',[-l l],'ZLim',[-1 42])
+gv = animatedline('Color','b');
+set(gca,'XLim',[-5 50],'YLim',[-30 30],'ZLim',[-3 30])
 view(43,24)
 grid on 
-for i=1:length(out.pos.Data(:,3))
+for i=1:min(length(out.pos.Data(:,3)),length(out.pos_GV.Data(:,1)))
     addpoints(curve,out.pos.Data(i,1),out.pos.Data(i,2),out.pos.Data(i,3));
+    addpoints(gv,out.pos_GV.Data(i,1),out.pos_GV.Data(i,2),out.pos_GV.Data(i,3));
     drawnow
 end
 %% 3D PLOT
 figure
 plot3(out.pos.Data(:,1),out.pos.Data(:,2),out.pos.Data(:,3),'--','LineWidth',1,'color','r')
-set(gca,'XLim',[-l l],'YLim',[-l l],'ZLim',[-1 42])
+set(gca,'XLim',[-5 55],'YLim',[-30 30],'ZLim',[-3 30])
 view(43,24)
 %%%
-camproj perspective 
-camva(0.5)
+%camproj perspctive 
+camva(0.7)
 
 hlight = camlight('headlight'); 
 lighting gouraud
