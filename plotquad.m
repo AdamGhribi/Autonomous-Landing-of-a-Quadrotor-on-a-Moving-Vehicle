@@ -1,16 +1,17 @@
 %% 3D Plot 
 % by : WILLIAM SELBY
 % https://www.wilselby.com/research/arducopter/modeling/
+% modified by Adam Ghribi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure
 plot3(out.pos.Data(:,1),out.pos.Data(:,2),out.pos.Data(:,3),'--','LineWidth',1,'color','r')
-set(gca,'XLim',[-2 55],'YLim',[-20 20],'ZLim',[0 20])
+set(gca,'XLim',[-2 40],'YLim',[-10 10],'ZLim',[0 20])
 view(43,24)
 %%%
 %camproj perspctive 
 camva(2.5)
-
+% 
 hlight = camlight('headlight'); 
 lighting gouraud
 set(gcf,'Renderer','OpenGL')
@@ -31,8 +32,17 @@ Quad.Motor2 = patch('xdata',Quad.Motor2X,'ydata',Quad.Motor2Y,'zdata',Quad.Motor
 Quad.Motor3 = patch('xdata',Quad.Motor3X,'ydata',Quad.Motor3Y,'zdata',Quad.Motor3Z,'facealpha',.3,'facecolor','k');
 Quad.Motor4 = patch('xdata',Quad.Motor4X,'ydata',Quad.Motor4Y,'zdata',Quad.Motor4Z,'facealpha',.3,'facecolor','k');
 
+carx= Quad.X_armX*7;
+cary= Quad.X_armY*50;
+carz= Quad.X_armZ*20;
+car = patch('xdata',carx,'ydata',cary,'zdata',carz,'facealpha',.3,'facecolor','k');
 
-for S =1:length(out.pos.Data(:,3)) 
+
+for S =1:min(length(out.pos.Data(:,3)),length(out.pos_GV.Data(:,1))) 
+    
+    targetx = out.pos_GV.Data(S,1);
+    targety = out.pos_GV.Data(S,2);
+    targetz = out.pos_GV.Data(S,3);
     
     Quad.X = out.pos.Data(S,1);
     Quad.Y = -out.pos.Data(S,2);
@@ -40,9 +50,13 @@ for S =1:length(out.pos.Data(:,3))
     Quad.phi = out.euler.Data(S,2);
     Quad.theta =- out.euler.Data(S,1);
     Quad.psi = -out.euler.Data(S,3);
+    
+[x,y,z]=rotateBFtoGF(carx,cary,carz,0,0,0);   
+set(car,'xdata',targetx+x,'ydata',targety+y,'zdata',targetz+z)
 
 [Quad.Xtemp,Quad.Ytemp,Quad.Ztemp]=rotateBFtoGF(Quad.X_armX,Quad.X_armY,Quad.X_armZ,Quad.phi,Quad.theta,Quad.psi);
 set(Quad.X_arm,'xdata',Quad.Xtemp+Quad.X,'ydata',-(Quad.Ytemp+Quad.Y),'zdata',-(Quad.Ztemp+Quad.Z))
+
 
 [Quad.Xtemp,Quad.Ytemp,Quad.Ztemp]=rotateBFtoGF(Quad.Y_armX,Quad.Y_armY,Quad.Y_armZ,Quad.phi,Quad.theta,Quad.psi);
 set(Quad.Y_arm,'xdata',Quad.Xtemp+Quad.X,'ydata',-(Quad.Ytemp+Quad.Y),'zdata',-(Quad.Ztemp+Quad.Z))
@@ -59,8 +73,9 @@ set(Quad.Motor3,'xdata',Quad.Xtemp+Quad.X,'ydata',-(Quad.Ytemp+Quad.Y),'zdata',-
 [Quad.Xtemp,Quad.Ytemp,Quad.Ztemp]=rotateBFtoGF(Quad.Motor4X,Quad.Motor4Y,Quad.Motor4Z,Quad.phi,Quad.theta,Quad.psi);
 set(Quad.Motor4,'xdata',Quad.Xtemp+Quad.X,'ydata',-(Quad.Ytemp+Quad.Y),'zdata',-(Quad.Ztemp+Quad.Z-2*Quad.t))
        campos('auto')
-        camtarget([0 0 0])%[Quad.X -Quad.Y -Quad.Z])
+       camtarget([Quad.X -Quad.Y -Quad.Z])
        camroll(0);
+
 drawnow;
   
 end
