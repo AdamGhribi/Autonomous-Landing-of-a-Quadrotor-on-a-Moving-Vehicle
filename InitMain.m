@@ -13,6 +13,8 @@ init
 out=sim('SiL.slx',inf);
 %% 2D Plot
 plotpoint
+legend('','','Quadrotor','GV')
+title('With KF')
 
 %% 3D PLOT
 plotquad
