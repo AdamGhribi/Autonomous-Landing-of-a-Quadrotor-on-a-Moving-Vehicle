@@ -12,8 +12,9 @@ The simulation are performed using Simulink. We used also the Model Predictive C
 To run the simulation, open "initMain.m"  
 
 ## Simulation Setup
-![droneprm](droneprm.jpg)
-
+![droneprm](droneprm.JPG)
+![road](road.JPG)
+![fig1](fig1.JPG)
 
 ## Bibliography
 [1] Borowczyk A. et al. “Autonomous landing of a quadcopter on a high-speed ground vehicle”.
